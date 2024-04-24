@@ -1,0 +1,3 @@
+{"email":"","f_name":"","l_name":"","birthday":"","address":"","phone":""}
+
+// curl -X POST -H "Content-Type: application/json" -d {\"email\":\"mymail@mail.co\",\"f_name\":\"hi\",\"l_name\":\"me\",\"birthday\":\"1990-01-01\",\"address\":\"aeagea\",\"phone\":\"1341341431\"} http://localhost:8080/api/createUser
