@@ -9,20 +9,20 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 public class User {
+    private int id = -1;
     @NotNull(message = "Birth date is mandatory")
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date birthday;
     @Email(message = "Email is not valid", regexp = "^[\\w\\.-]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @NotNull(message = "Email is mandatory")
-    String email;
+    private String email;
     @NotNull(message = "First Name is mandatory")
-    String f_name;
+    private String f_name;
     @NotNull(message = "Last Name is mandatory")
-    String l_name;
+    private String l_name;
     
-    String address;
-    long phone;
-
+    private String address;
+    private long phone;
     
     public User(
             Date birthday,
@@ -88,6 +88,14 @@ public class User {
         this.phone = phone;
     }
 
+    public int getId(){
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(birthday, email, f_name, l_name, address, phone);
@@ -95,21 +103,20 @@ public class User {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj) { 
+            return true;
+        }
         if (obj == null || getClass() != obj.getClass()) return false;
         User user = (User) obj;
-        return phone == user.phone &&
-                Objects.equals(birthday, user.birthday) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(f_name, user.f_name) &&
-                Objects.equals(l_name, user.l_name) &&
-                Objects.equals(address, user.address);
+        return Objects.equals(email, user.getEmail()) || phone == user.getPhone() || id == user.getId();
     }
+
 
     @Override
     public String toString() {
         return "User{" +
-                "birthday=" + birthday +
+                "id='" + id + '\'' +
+                ", birthday=" + birthday +
                 ", email='" + email + '\'' +
                 ", f_name='" + f_name + '\'' +
                 ", l_name='" + l_name + '\'' +
