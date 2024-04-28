@@ -1,2 +1,3 @@
 curl -X POST -H "Content-Type: application/json" -d {\"email\":\"mymaiasdl@mail.com\",\"f_name\":\"hi\",\"l_name\":\"me\",\"birthday\":\"2004-04-24\",\"address\":\"aeagea\",\"phone\":\"134132134115\",\"id\":\"214\"} http://localhost:8080/api/createUser
 curl -X DELETE http://localhost:8080/api/removeUser/1
+curl -X PUT -H "Content-Type: application/json" -d {\"email\":\"mymail@mail.com\",\"f_name\":\"Richard\",\"l_name\":\"Paterson\",\"birthday\":\"1995-12-24\",\"address\":\"Bulvard50b,Kyiv\",\"phone\":\"1341321341143145\"} http://localhost:8080/api/updateUser/0

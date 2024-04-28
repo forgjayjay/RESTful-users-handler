@@ -21,8 +21,8 @@ public class User {
     @NotNull(message = "Last Name is mandatory")
     private String l_name;
     
-    private String address;
-    private long phone;
+    private String address = "";
+    private long phone = 0;
     
     public User(
             Date birthday,
@@ -108,7 +108,7 @@ public class User {
         }
         if (obj == null || getClass() != obj.getClass()) return false;
         User user = (User) obj;
-        return Objects.equals(email, user.getEmail()) || phone == user.getPhone() || id == user.getId();
+        return Objects.equals(email, user.getEmail()) || (phone != 0 && phone == user.getPhone()) || id == user.getId();
     }
 
 
@@ -123,6 +123,6 @@ public class User {
                 ", address='" + address + '\'' +
                 ", phone=" + phone +
                 '}';
-    }
+    } 
 
 }

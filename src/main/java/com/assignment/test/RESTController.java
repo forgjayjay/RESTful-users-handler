@@ -2,6 +2,8 @@ package com.assignment.test;
 
 import java.io.ByteArrayOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,17 +29,14 @@ public class RESTController {
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Autowired
-    UserValidator validator;
     //get put post delete
 
+    Logger logger = LoggerFactory.getLogger(RESTController.class);
+
     @PostMapping("/createUser")
-    public ResponseEntity<String> postUser(@RequestBody String str){
+    public ResponseEntity<String> postUser(@RequestBody String json){
         try{
-            User user = mapper.readValue(str, User.class);
-            if(!validator.validate(user).isEmpty()) return ResponseEntity.badRequest().body("Some of the required fields are not present/are incorrect");
-            
+            User user = mapper.readValue(json, User.class);
             if(userHandler.add(user)){
                 return ResponseEntity.ok(user.toString());
             }
@@ -47,10 +46,10 @@ public class RESTController {
         return ResponseEntity.badRequest().body("User may already exist or is underaged");
     }
 
-    @DeleteMapping("/removeUser")
-    public ResponseEntity<String> removeUser(@RequestBody String str){
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<String> deleteUser(@RequestBody String json){
         try {
-            User user =  mapper.readValue(str, User.class); 
+            User user =  mapper.readValue(json, User.class); 
             if(userHandler.remove(user)){
                 return ResponseEntity.ok().body("Removed given user");
             }
@@ -59,8 +58,8 @@ public class RESTController {
         }        
         return ResponseEntity.badRequest().body("User may not exist");
     }
-    @DeleteMapping("/removeUser/{id}")
-    public ResponseEntity<String> removeUserById(@PathVariable int id){
+    @DeleteMapping("/deleteUser/{id}")
+    public ResponseEntity<String> deleteUserById(@PathVariable int id){
            
         if(userHandler.removeById(id)){
             return ResponseEntity.ok().body("Removed given user");
@@ -68,11 +67,18 @@ public class RESTController {
         return ResponseEntity.badRequest().body("User may not exist");
     }
 
-    @PutMapping("path/{id}")
-    public String putMethodName(@PathVariable String id, @RequestBody String entity) {
-        //TODO: process PUT request
-        
-        return entity;
+    @PutMapping("updateUser/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable int id, @RequestBody String json) {
+        try{
+            User user = mapper.readValue(json, User.class);
+
+            if(userHandler.updateUser(id, user)){
+                return ResponseEntity.ok().body("Updated given user");
+            }
+        } catch (Exception e) {
+            ResponseEntity.internalServerError().body("Something went wrong");
+        }   
+        return ResponseEntity.badRequest().body("User may not exist");
     }
 
     @GetMapping("/getAllUsers")
