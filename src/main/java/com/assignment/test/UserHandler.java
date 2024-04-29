@@ -10,7 +10,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,26 +22,23 @@ public class UserHandler {
 
     private List<User> userList = new ArrayList<>();
     private Map<Integer, User> userMap = new HashMap<>();
-    @Value("${assignment.age.restriction}")
-    private long ageLimit;
+  
 
-    public boolean add(User user){
+    public User add(User user){
         if(!userList.contains(user)){
-            boolean valid = validator.validate(user).isEmpty();
-            if(!valid) return false;
-            long userBirthday = ageLimit * 365 * 24 * 60 * 60 * 1000;
-            if(!new Date().after(new Date(user.getBirthday().getTime() + userBirthday))) return false;
-            boolean added = userList.add(user);
+            boolean valid = (validator.validate(user).isEmpty()) && (validator.validateAge(user));
+            if(!valid) return null;
+            userList.add(user);
             user.setId(userList.indexOf(user));
             userMap.put(user.getId(), user);
-            return added;
+            return user;
         }
-        return false;
+        return null;
     }
 
     public boolean remove(Object user){
         userMap.remove(userList.indexOf(user));
-        return userList.remove(user); 
+        return userList.remove(user);
     }
     
     public boolean removeById(int id){
@@ -51,14 +47,10 @@ public class UserHandler {
         return removed;
     }
 
-    public User get(int index){
-        return userList.get(index);
-    }
-
-    public boolean updateUser(int index, User updatedUser){
+    public User updateUser(int index, User updatedUser){
         User user = userMap.get(index);
+        User tempUser = user;
         if(user != null){
-            logger.info(user.toString() + " : " + updatedUser.toString());
             Field[] fields = user.getClass().getDeclaredFields();
             for (Field field : fields) {
                 field.setAccessible(true);
@@ -67,25 +59,51 @@ public class UserHandler {
                 Object updatedValue;
                 try{
                     userValue = field.get(user);
-                    updatedValue = field.get(updatedUser); 
-                    if(userValue==null || updatedValue==null) continue;
-                } catch(NullPointerException | IllegalArgumentException | IllegalAccessException e){
-                    logger.info(e.getMessage());
+                    updatedValue = field.get(updatedUser);
+
+                    if(updatedValue==null || updatedValue == (Object)0L) continue;
+                } 
+                catch(NullPointerException | IllegalArgumentException | IllegalAccessException e){
+                    logger.error("Expected exception at user update: "+e.getMessage());
                     continue;
                 }
                 if(!updatedValue.equals(userValue)){
                     try {
                         field.set(user, updatedValue);
                     } catch (Exception e) {
-                        logger.info("Error during user update: ", e.getMessage());
-                        return false;
+                        logger.error("Error during user update: ", e.getMessage());
+                        return null;
                     }
-                }
+                 }
             }
-            return true;
+            if(!validator.validate(user).isEmpty() || !validator.validateAge(user)){
+                logger.info("Rolling back user changes due to constraint violations");
+                user = tempUser;
+                return null;
+            }
+            return user;
         }
-        return false;
+        return null;
     }
+
+    public List<User> getAllUsersFromTo(Date from, Date to){
+        if(!from.before(to)) return null;
+        
+        List<User> returnList = new ArrayList<>();
+        
+        for (User user : userList) {
+            if(user.getBirth_date().before(to) && user.getBirth_date().after(from)){
+                returnList.add(user);
+            }
+        }
+        
+        return returnList;
+    }
+
+
+    public User getUser(int index){
+        return userList.get(index);
+    }    
 
     public List<User> getAllUsers(){
         return userList;

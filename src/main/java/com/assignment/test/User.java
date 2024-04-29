@@ -12,7 +12,7 @@ public class User {
     private int id = -1;
     @NotNull(message = "Birth date is mandatory")
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date birthday;
+    private Date birth_date;
     @Email(message = "Email is not valid", regexp = "^[\\w\\.-]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @NotNull(message = "Email is mandatory")
     private String email;
@@ -22,17 +22,17 @@ public class User {
     private String l_name;
     
     private String address = "";
-    private long phone = 0;
+    private long phone;
     
     public User(
-            Date birthday,
+            Date birth_date,
             String email,
             String f_name,
             String l_name,
             String address,
             long phone
         ){
-            this.birthday=birthday;
+            this.birth_date=birth_date;
             this.email=email;
             this.f_name=f_name;
             this.l_name=l_name;
@@ -40,12 +40,12 @@ public class User {
             this.phone=phone;
     }
 
-    public Date getBirthday() {
-        return this.birthday;
+    public Date getBirth_date() {
+        return this.birth_date;
     }
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
+    public void setBirth_date(Date birth_date) {
+        this.birth_date = birth_date;
     }
 
     public String getEmail() {
@@ -98,7 +98,7 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(birthday, email, f_name, l_name, address, phone);
+        return Objects.hash(birth_date, email, f_name, l_name, address, phone);
     }
 
     @Override
@@ -116,13 +116,13 @@ public class User {
     public String toString() {
         return "User{" +
                 "id='" + id + '\'' +
-                ", birthday=" + birthday +
-                ", email='" + email + '\'' +
                 ", f_name='" + f_name + '\'' +
                 ", l_name='" + l_name + '\'' +
+                ", email='" + email + '\'' +
+                ", birth_date=" + birth_date +
                 ", address='" + address + '\'' +
                 ", phone=" + phone +
                 '}';
-    } 
+    }   
 
 }
