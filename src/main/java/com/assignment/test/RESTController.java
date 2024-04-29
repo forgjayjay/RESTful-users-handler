@@ -22,10 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
-
-
 @RestController
 @RequestMapping("/api")
 public class RESTController {

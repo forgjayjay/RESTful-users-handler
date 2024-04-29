@@ -111,7 +111,6 @@ public class User {
         return Objects.equals(email, user.getEmail()) || (phone != 0 && phone == user.getPhone()) || id == user.getId();
     }
 
-
     @Override
     public String toString() {
         return "User{" +
@@ -124,5 +123,4 @@ public class User {
                 ", phone=" + phone +
                 '}';
     }   
-
 }

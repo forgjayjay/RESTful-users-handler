@@ -8,15 +8,11 @@ import jakarta.validation.ValidatorFactory;
 import java.util.Date;
 import java.util.Set;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 @Service
 public class UserValidator {
     private Validator validator;
-
-    //private Logger logger = LoggerFactory.getLogger(UserValidator.class);
 
     @Value("${assignment.age.restriction}")
     private long ageLimit;

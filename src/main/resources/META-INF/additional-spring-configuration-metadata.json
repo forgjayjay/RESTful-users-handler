@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "assignment.age.restriction",
+  "type": "java.lang.String",
+  "description": "Age restriction for the user"
+}]}

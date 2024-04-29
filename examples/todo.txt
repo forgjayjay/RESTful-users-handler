@@ -15,4 +15,3 @@ Requirements:
     3. Code is covered by unit tests using Spring 
     4. Code has error handling for REST
 +   5. API responses are in JSON format
-
