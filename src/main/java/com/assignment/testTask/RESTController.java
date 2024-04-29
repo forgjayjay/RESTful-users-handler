@@ -1,6 +1,8 @@
 package com.assignment.testTask;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +22,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.assignment.testTask.exception.ApiRequestException;
+import com.assignment.testTask.exception.InternalApiException;
+import com.assignment.testTask.user.User;
+import com.assignment.testTask.user.UserHandler;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -34,94 +41,95 @@ public class RESTController {
     Logger logger = LoggerFactory.getLogger(RESTController.class);
 
     @PostMapping("/postUser")
-    public ResponseEntity<String> postUser(@RequestBody String json){
+    public ResponseEntity<?> postUser(@RequestBody String json){
         try{
             User user = mapper.readValue(json, User.class);
             if(userHandler.add(user) != null){
                 return ResponseEntity.created(new URI("/api/getUser/"+user.getId())).body("{\"data\":"+mapper.writeValueAsString(user)+"}");
             }
-        } catch (Exception e) {
+        } catch (JsonProcessingException | URISyntaxException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
+            throw new InternalApiException("Internal server error");
         }    
-        return ResponseEntity.badRequest().body("{\"error\":\"User exists or constraint violation\"}");
+        throw new ApiRequestException("User already exists or constraint violation");
     }
 
     @DeleteMapping("/deleteUser")
-    public ResponseEntity<String> deleteUser(@RequestBody String json){
+    public ResponseEntity<?> deleteUser(@RequestBody String json){
         try {
             User user =  mapper.readValue(json, User.class); 
             if(userHandler.remove(user)){
                 return ResponseEntity.ok().body(null);
             } else {
-                return ResponseEntity.badRequest().body("{\"error\":\"User may not exist\"}");
+                throw new ApiRequestException("User doesn't exist");
             }
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
+            throw new InternalApiException("Internal server error");
         }        
     }
 
     @DeleteMapping("/deleteUser/{id}")
-    public ResponseEntity<String> deleteUserById(@PathVariable int id){
-        if(userHandler.removeById(id)){
+    public ResponseEntity<?> deleteUserById(@PathVariable int id){
+        if(userHandler.removeById(id) != null){
             return ResponseEntity.ok().body(null);
         } else {
-            return ResponseEntity.badRequest().body("{\"error\":\"User may not exist\"}");
+            throw new ApiRequestException("User with id = " + id + " doesn't exist");
         }
     }
 
     @PutMapping("putUser/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable int id, @RequestBody String json) {
+    public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody String json) {
         try{
             User user = mapper.readValue(json, User.class);
             User updatedUser = userHandler.updateUser(id, user);
             if(updatedUser != null){
                 return ResponseEntity.ok().body("{\"data:\""+mapper.writeValueAsString(updatedUser)+"}");
             } else {
-                return ResponseEntity.badRequest().body("{\"error\":\"User may not exist or constraint violation\"}");
+                throw new ApiRequestException("User with id = " + id + " doesn't exist or update contains constraint violations");
             }
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
+            throw new InternalApiException("Internal server error");
+
         }   
     }
 
-    @GetMapping("/getUser/{id}")
-    public ResponseEntity<String> getMethodName(@PathVariable int id) {
+    @GetMapping("/getUsers/{id}")
+    public ResponseEntity<?> getUsersById(@PathVariable int id) {
+        User user = userHandler.getUser(id);
+        if(user == null) throw new ApiRequestException("User with id = " + id + " doesn't exist");
         try{
-            User user = userHandler.getUser(id);
-            if(user == null) return ResponseEntity.badRequest().body("{\"error\":\"User may not exist\"}");
             return  ResponseEntity.ok().body("{\"data:\""+mapper.writeValueAsString(user)+"}");
-        } catch (Exception e){
+        } catch (JsonProcessingException e){
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
+            throw new InternalApiException("Internal server error");
         }
     }
     
-    @GetMapping("/getAllUsers")
-    public ResponseEntity<String> getUsers() {
+    @GetMapping("/getUsers")
+    public ResponseEntity<?> getUsers() {
         try{
-            List<User> userList = userHandler.getAllUsers();
+            Collection<?> userList = userHandler.getAllUsers();
             return  ResponseEntity.ok().body("{\"data\":"+mapper.writeValueAsString(userList)+"}");
-        } catch (Exception e){
+        } catch (JsonProcessingException e){
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
+            throw new InternalApiException("Internal server error");
         }
     }
     
     @GetMapping("/getUsersByDate")
-    public ResponseEntity<String> getUsersDateToDate(
+    public ResponseEntity<?> getUsersDateToDate(
         @RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
         @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
     ){
         try{
             List<User> userList = userHandler.getAllUsersFromTo(fromDate, toDate);
-            if(userList == null) return ResponseEntity.badRequest().body("{\"error\":\"User may not exist or constraint violation\"}");
+            if(userList == null) throw new ApiRequestException("Invalid date range");
             return ResponseEntity.ok().body("{\"data\":"+mapper.writeValueAsString(userList)+"}");
-        } catch (Exception e){
+        } catch (JsonProcessingException e){
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
+            throw new InternalApiException("Internal server error");
         }
     }
 }

@@ -1,7 +1,8 @@
-package com.assignment.testTask;
+package com.assignment.testTask.user;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,31 +21,34 @@ public class UserHandler {
     @Autowired
     UserValidator validator;
 
-    private List<User> userList = new ArrayList<>();
     private Map<Integer, User> userMap = new HashMap<>();
-  
+    private int index = 0;
 
     public User add(User user){
-        if(!userList.contains(user)){
+        if(!userMap.values().contains(user)){
             boolean valid = (validator.validate(user).isEmpty()) && (validator.validateAge(user));
             if(!valid) return null;
-            userList.add(user);
-            user.setId(userList.indexOf(user));
+            user.setId(index);
             userMap.put(user.getId(), user);
+            index++;
             return user;
         }
         return null;
     }
 
-    public boolean remove(Object user){
-        userMap.remove(userList.indexOf(user));
-        return userList.remove(user);
+    public boolean remove(User user){
+        int id = -1;
+        for (User i : userMap.values()) {
+            if(i.getId() == user.getId()) {
+                id = user.getId();
+                break;
+            }
+        }
+        return userMap.remove(id, user);
     }
     
-    public boolean removeById(int id){
-        boolean removed = userList.remove(userMap.get(id));
-        userMap.remove(id);
-        return removed;
+    public User removeById(int id){
+        return userMap.remove(id);
     }
 
     public User updateUser(int index, User updatedUser){
@@ -91,7 +95,7 @@ public class UserHandler {
         
         List<User> returnList = new ArrayList<>();
         
-        for (User user : userList) {
+        for (User user : userMap.values()) {
             if(user.getBirth_date().before(to) && user.getBirth_date().after(from)){
                 returnList.add(user);
             }
@@ -102,11 +106,10 @@ public class UserHandler {
 
 
     public User getUser(int index){
-        if(userList.size()>0 && userList.size()-1>=index) return userList.get(index);
-        else return null;
+        return userMap.get(index);
     }    
 
-    public List<User> getAllUsers(){
-        return userList;
+    public Collection<?> getAllUsers(){
+        return userMap.values();
     }
 }
