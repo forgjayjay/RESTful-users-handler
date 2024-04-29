@@ -1,4 +1,4 @@
-package com.assignment.test;
+package com.assignment.testTask;
 
 import java.util.Date;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package com.assignment.test;
+package com.assignment.testTask;
 
 import java.net.URI;
 import java.util.Date;
@@ -42,9 +42,9 @@ public class RESTController {
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("\"error\":\"Internal server error\"");
+            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
         }    
-        return ResponseEntity.badRequest().body("\"error\":\"User exists or constraint violation\"");
+        return ResponseEntity.badRequest().body("{\"error\":\"User exists or constraint violation\"}");
     }
 
     @DeleteMapping("/deleteUser")
@@ -54,21 +54,20 @@ public class RESTController {
             if(userHandler.remove(user)){
                 return ResponseEntity.ok().body(null);
             } else {
-                return ResponseEntity.badRequest().body("\"error\":\"User may not exist\"");
+                return ResponseEntity.badRequest().body("{\"error\":\"User may not exist\"}");
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("\"error\":\"Internal server error\"");
+            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
         }        
     }
 
     @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable int id){
-           
         if(userHandler.removeById(id)){
             return ResponseEntity.ok().body(null);
         } else {
-            return ResponseEntity.badRequest().body("\"error\":\"User may not exist\"");
+            return ResponseEntity.badRequest().body("{\"error\":\"User may not exist\"}");
         }
     }
 
@@ -80,11 +79,11 @@ public class RESTController {
             if(updatedUser != null){
                 return ResponseEntity.ok().body("{\"data:\""+mapper.writeValueAsString(updatedUser)+"}");
             } else {
-                return ResponseEntity.badRequest().body("\"error\":\"User may not exist or constraint violation\"");
+                return ResponseEntity.badRequest().body("{\"error\":\"User may not exist or constraint violation\"}");
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("\"error\":\"Internal server error\"");
+            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
         }   
     }
 
@@ -92,14 +91,14 @@ public class RESTController {
     public ResponseEntity<String> getMethodName(@PathVariable int id) {
         try{
             User user = userHandler.getUser(id);
+            if(user == null) return ResponseEntity.badRequest().body("{\"error\":\"User may not exist\"}");
             return  ResponseEntity.ok().body("{\"data:\""+mapper.writeValueAsString(user)+"}");
         } catch (Exception e){
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("\"error\":\"Internal server error\"");
+            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
         }
     }
     
-
     @GetMapping("/getAllUsers")
     public ResponseEntity<String> getUsers() {
         try{
@@ -107,7 +106,7 @@ public class RESTController {
             return  ResponseEntity.ok().body("{\"data\":"+mapper.writeValueAsString(userList)+"}");
         } catch (Exception e){
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("\"error\":\"Internal server error\"");
+            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
         }
     }
     
@@ -118,11 +117,11 @@ public class RESTController {
     ){
         try{
             List<User> userList = userHandler.getAllUsersFromTo(fromDate, toDate);
-            if(userList == null) return ResponseEntity.badRequest().body("\"error\":\"User may not exist or constraint violation\"");
+            if(userList == null) return ResponseEntity.badRequest().body("{\"error\":\"User may not exist or constraint violation\"}");
             return ResponseEntity.ok().body("{\"data\":"+mapper.writeValueAsString(userList)+"}");
         } catch (Exception e){
             logger.error(e.getMessage());
-            return ResponseEntity.internalServerError().body("\"error\":\"Internal server error\"");
+            return ResponseEntity.internalServerError().body("{\"error\":\"Internal server error\"}");
         }
     }
 }

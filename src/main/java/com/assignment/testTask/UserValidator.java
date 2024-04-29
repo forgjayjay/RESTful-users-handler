@@ -1,4 +1,4 @@
-package com.assignment.test;
+package com.assignment.testTask;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

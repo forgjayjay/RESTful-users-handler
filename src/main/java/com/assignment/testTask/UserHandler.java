@@ -1,4 +1,4 @@
-package com.assignment.test;
+package com.assignment.testTask;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -102,7 +102,8 @@ public class UserHandler {
 
 
     public User getUser(int index){
-        return userList.get(index);
+        if(userList.size()>0 && userList.size()-1>=index) return userList.get(index);
+        else return null;
     }    
 
     public List<User> getAllUsers(){
