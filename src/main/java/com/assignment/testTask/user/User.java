@@ -1,6 +1,6 @@
 package com.assignment.testTask.user;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,7 +12,7 @@ public class User {
     private int id = -1;
     @NotNull(message = "Birth date is mandatory")
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date birth_date;
+    private LocalDate birth_date;
     @Email(message = "Email is not valid", regexp = "^[\\w\\.-]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     @NotNull(message = "Email is mandatory")
     private String email;
@@ -21,16 +21,16 @@ public class User {
     @NotNull(message = "Last Name is mandatory")
     private String l_name;
     
-    private String address = "";
-    private long phone;
+    private String address;
+    private String phone;
     
     public User(
-            Date birth_date,
+            LocalDate birth_date,
             String email,
             String f_name,
             String l_name,
             String address,
-            long phone
+            String phone
         ){
             this.birth_date=birth_date;
             this.email=email;
@@ -40,11 +40,11 @@ public class User {
             this.phone=phone;
     }
 
-    public Date getBirth_date() {
+    public LocalDate getBirth_date() {
         return this.birth_date;
     }
 
-    public void setBirth_date(Date birth_date) {
+    public void setBirth_date(LocalDate birth_date) {
         this.birth_date = birth_date;
     }
 
@@ -80,11 +80,11 @@ public class User {
         this.address = address;
     }
 
-    public long getPhone() {
+    public String getPhone() {
         return this.phone;
     }
 
-    public void setPhone(long phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
@@ -108,7 +108,8 @@ public class User {
         }
         if (obj == null || getClass() != obj.getClass()) return false;
         User user = (User) obj;
-        return Objects.equals(email, user.getEmail()) || (phone != 0 && phone == user.getPhone()) || id == user.getId();
+        if (phone == null)return Objects.equals(email, user.getEmail()) || id == user.getId();
+        return Objects.equals(email, user.getEmail()) || ((phone.isEmpty() || phone.isBlank()) && phone.equals(user.getPhone())) || id == user.getId();
     }
 
     @Override

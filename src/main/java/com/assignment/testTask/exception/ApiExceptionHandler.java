@@ -9,6 +9,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
@@ -42,6 +43,13 @@ public class ApiExceptionHandler{
         HttpStatusCode noResourceFound = HttpStatusCode.valueOf(404);
         ApiException apiException = new ApiException("No resource found", noResourceFound, ZonedDateTime.now(ZoneId.of("Z")));
         return new ResponseEntity<>(apiException, noResourceFound);
+    }
+
+    @ExceptionHandler(value = {MethodNotAllowedException.class})
+    public ResponseEntity<?> handleMethodNotAllowed(MethodNotAllowedException e){
+        HttpStatusCode methodNotAllowed = HttpStatusCode.valueOf(405);
+        ApiException apiException = new ApiException("Method not allowed", methodNotAllowed, ZonedDateTime.now(ZoneId.of("Z")));
+        return new ResponseEntity<>(apiException, methodNotAllowed);
     }
 
 }

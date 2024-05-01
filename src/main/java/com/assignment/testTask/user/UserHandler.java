@@ -1,9 +1,9 @@
 package com.assignment.testTask.user;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class UserHandler {
         return null;
     }
 
-    public boolean remove(User user){
+    public User remove(User user){
         int id = -1;
         for (User i : userMap.values()) {
             if(i.getId() == user.getId()) {
@@ -44,7 +44,7 @@ public class UserHandler {
                 break;
             }
         }
-        return userMap.remove(id, user);
+        return userMap.remove(id);
     }
     
     public User removeById(int id){
@@ -65,7 +65,7 @@ public class UserHandler {
                     userValue = field.get(user);
                     updatedValue = field.get(updatedUser);
 
-                    if(updatedValue==null || updatedValue == (Object)0L) continue;
+                    if(updatedValue==null) continue;
                 } 
                 catch(NullPointerException | IllegalArgumentException | IllegalAccessException e){
                     logger.error("Expected exception at user update: "+e.getMessage());
@@ -90,13 +90,13 @@ public class UserHandler {
         return null;
     }
 
-    public List<User> getAllUsersFromTo(Date from, Date to){
-        if(!from.before(to)) return null;
-        
+    public List<User> getAllUsersFromTo(LocalDate from, LocalDate to){
+        if(!from.isBefore(to) || from == null) return null;
+        if(to == null) to = LocalDate.now();
         List<User> returnList = new ArrayList<>();
         
         for (User user : userMap.values()) {
-            if(user.getBirth_date().before(to) && user.getBirth_date().after(from)){
+            if(user.getBirth_date().isBefore(to) && user.getBirth_date().isAfter(from.minusDays(1))){
                 returnList.add(user);
             }
         }
@@ -107,7 +107,21 @@ public class UserHandler {
 
     public User getUser(int index){
         return userMap.get(index);
-    }    
+    }
+
+    public User getUser(User user){
+        for (User tmpUser : userMap.values()) {
+            if(tmpUser.equals(user)){
+                return tmpUser;
+            }
+        }
+        return null;
+    }
+
+    public void clear(){
+        userMap.clear();
+        index=0;
+    }
 
     public Collection<?> getAllUsers(){
         return userMap.values();

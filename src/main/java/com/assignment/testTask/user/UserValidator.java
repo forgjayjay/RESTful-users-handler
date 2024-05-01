@@ -5,7 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,6 @@ public class UserValidator {
     }
 
     public boolean validateAge(User user){
-        long ageLimitMillis = ageLimit * 365 * 24 * 60 * 60 * 1000;
-        return (new Date().after(new Date(user.getBirth_date().getTime() + ageLimitMillis)));
+        return (LocalDate.now().isAfter(user.getBirth_date().plusYears(ageLimit)));
     }
 }

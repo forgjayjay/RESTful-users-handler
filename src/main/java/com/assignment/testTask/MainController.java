@@ -2,8 +2,8 @@ package com.assignment.testTask;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class MainController {
     public ResponseEntity<?> deleteUser(@RequestBody String json){
         try {
             User user =  mapper.readValue(json, User.class); 
-            if(userHandler.remove(user)){
+            if(userHandler.remove(user) != null){
                 return ResponseEntity.ok().body(null);
             } else {
                 throw new ApiRequestException("User doesn't exist");
@@ -84,7 +84,7 @@ public class MainController {
             User user = mapper.readValue(json, User.class);
             User updatedUser = userHandler.updateUser(id, user);
             if(updatedUser != null){
-                return ResponseEntity.ok().body("{\"data:\""+mapper.writeValueAsString(updatedUser)+"}");
+                return ResponseEntity.ok().body("{\"data\":"+mapper.writeValueAsString(updatedUser)+"}");
             } else {
                 throw new ApiRequestException("User with id = " + id + " doesn't exist or update contains constraint violations");
             }
@@ -100,7 +100,7 @@ public class MainController {
         User user = userHandler.getUser(id);
         if(user == null) throw new ApiRequestException("User with id = " + id + " doesn't exist");
         try{
-            return  ResponseEntity.ok().body("{\"data:\""+mapper.writeValueAsString(user)+"}");
+            return  ResponseEntity.ok().body("{\"data\":"+mapper.writeValueAsString(user)+"}");
         } catch (JsonProcessingException e){
             logger.error(e.getMessage());
             throw new InternalApiException("Internal server error");
@@ -120,8 +120,8 @@ public class MainController {
     
     @GetMapping("/getUsersByDate")
     public ResponseEntity<?> getUsersDateToDate(
-        @RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
-        @RequestParam(name = "to", defaultValue = "#{new java.util.Date()}") @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
+        @RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+        @RequestParam(name = "to", defaultValue = "#{new java.time.LocalDate().now()}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate
     ){
         try{
             List<User> userList = userHandler.getAllUsersFromTo(fromDate, toDate);
