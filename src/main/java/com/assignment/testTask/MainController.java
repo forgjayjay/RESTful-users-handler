@@ -31,14 +31,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api")
-public class RESTController {
+public class MainController {
     @Autowired 
     private UserHandler userHandler;
 
     @Autowired
     private ObjectMapper mapper;
 
-    Logger logger = LoggerFactory.getLogger(RESTController.class);
+    Logger logger = LoggerFactory.getLogger(RestController.class);
 
     @PostMapping("/postUser")
     public ResponseEntity<?> postUser(@RequestBody String json){
@@ -121,7 +121,7 @@ public class RESTController {
     @GetMapping("/getUsersByDate")
     public ResponseEntity<?> getUsersDateToDate(
         @RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
-        @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
+        @RequestParam(name = "to", defaultValue = "#{new java.util.Date()}") @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate
     ){
         try{
             List<User> userList = userHandler.getAllUsersFromTo(fromDate, toDate);

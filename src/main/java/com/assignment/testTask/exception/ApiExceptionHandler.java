@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -22,10 +23,10 @@ public class ApiExceptionHandler{
         return new ResponseEntity<>(apiException, badRequest);
     }
 
-    @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
+    @ExceptionHandler(value = {MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
     public ResponseEntity<?> defaultErrorHandler(Exception e){
         HttpStatusCode badRequest = HttpStatusCode.valueOf(400);
-        ApiException apiException = new ApiException("Wrong type input", badRequest, ZonedDateTime.now(ZoneId.of("Z")));
+        ApiException apiException = new ApiException("Wrong input type", badRequest, ZonedDateTime.now(ZoneId.of("Z")));
         return new ResponseEntity<>(apiException, badRequest);
     }
 
